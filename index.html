@@ -1,76 +1,305 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Посты</title>
+    <title>Posts</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            /* Add padding at the top for proper navigation display */
+            padding-top: 70px;
+        }
+        
+        #posts-container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            /* Remove fixed height and container scroll */
+            height: auto;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+        
+        .post {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            animation: fadeIn 0.5s ease-in;
+            /* Set height to 33% of viewport height */
+            height: 33vh;
+            box-sizing: border-box;
+            overflow-y: auto; /* Add scroll for large posts */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .author {
+            margin: 0;
+            font-size: 1.5em;
+            color: #333;
+        }
+        
+        .text {
+            margin: 10px 0 0;
+            font-size: 1em;
+            color: #666;
+            flex-grow: 1;
+        }
+        
+        .navigation {
+            position: fixed; /* Fix navigation at the top of the screen */
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 10px;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .navigation-inner {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .nav-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .loader {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        
+        .loader:after {
+            content: " ";
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div id="posts-container">
-        <div class="post">
-            <h2 class="author"></h2>
-            <p class="text"></p>
-        </div>
-        <div class="post">
-            <h2 class="author"></h2>
-            <p class="text"></p>
-        </div>
-        <div class="post">
-            <h2 class="author"></h2>
-            <p class="text"></p>
-        </div>
-        <div class="post">
-            <h2 class="author"></h2>
-            <p class="text"></p>
-        </div>
-        <div class="post">
-            <h2 class="author"></h2>
-            <p class="text"></p>
+    <div class="navigation">
+        <div class="navigation-inner">
+            <button id="prev-page" class="nav-button" disabled>To Beginning</button>
+            <span id="page-indicator">Posts 0 of 0</span>
+            <button id="next-page" class="nav-button">Load More</button>
         </div>
     </div>
+    <div id="posts-container">
+        <!-- Posts will be added here dynamically -->
+    </div>
+    <div id="loader" class="loader"></div>
+    
     <script>
-        // Генерация массива постов (20 штук)
+        // Generate array of posts (50 items for better effect)
         const posts = [];
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= 50; i++) {
             posts.push({
-                author: `Автор ${i}`,
-                text: `Текст поста ${i}`
+                author: `Author ${i}`,
+                text: `This is the text of post number ${i}. There might be something interesting here or not, but the main thing is that it works!`
             });
         }
 
-        const postsPerPage = 5; // Количество постов на "странице"
-        let currentPage = 0;    // Текущая "страница"
+        const postsPerPage = 5; // Number of posts to load at once
+        let currentPage = 0;    // Current page
+        const totalPosts = posts.length; // Total posts count
+        const totalPages = Math.ceil(totalPosts / postsPerPage); // Total pages count
+        
+        const postsContainer = document.getElementById('posts-container');
+        const prevButton = document.getElementById('prev-page');
+        const nextButton = document.getElementById('next-page');
+        const pageIndicator = document.getElementById('page-indicator');
+        const loader = document.getElementById('loader');
 
-        // Функция для отображения постов
-        function displayPosts() {
-            const postElements = document.querySelectorAll('.post');
-            const start = currentPage * postsPerPage;
-            const end = start + postsPerPage;
-            const currentPosts = posts.slice(start, end);
+        // Create fixed containers for posts
+        function createPostContainers() {
+            postsContainer.innerHTML = '';
+            for (let i = 0; i < postsPerPage; i++) {
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.id = `post-${i}`;
+                postsContainer.appendChild(postElement);
+            }
+        }
+
+        // Function to update navigation buttons
+        function updateNavButtons() {
+            prevButton.disabled = currentPage === 0;
+            nextButton.disabled = currentPage >= totalPages - 1;
             
-            postElements.forEach((postElement, index) => {
-                if (currentPosts[index]) {
-                    postElement.querySelector('.author').textContent = currentPosts[index].author;
-                    postElement.querySelector('.text').textContent = currentPosts[index].text;
-                } else {
-                    postElement.querySelector('.author').textContent = '';
-                    postElement.querySelector('.text').textContent = '';
-                }
-            });
+            const startPost = currentPage * postsPerPage + 1;
+            const endPost = Math.min((currentPage + 1) * postsPerPage, totalPosts);
+            pageIndicator.textContent = `Posts ${startPost}-${endPost} of ${totalPosts}`;
         }
 
-        // Обработчик прокрутки
-        window.addEventListener('scroll', () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-                if ((currentPage + 1) * postsPerPage < posts.length) {
-                    currentPage++;
-                    displayPosts();
+        // Function to update post content
+        function updatePostContent(postElement, postData) {
+            postElement.innerHTML = '';
+            
+            const authorElement = document.createElement('h2');
+            authorElement.className = 'author';
+            authorElement.textContent = postData.author;
+            
+            const textElement = document.createElement('p');
+            textElement.className = 'text';
+            textElement.textContent = postData.text;
+            
+            postElement.appendChild(authorElement);
+            postElement.appendChild(textElement);
+        }
+
+        // Load posts for current page
+        function loadPostsPage(page, scrollToTop = true) {
+            loader.style.display = 'block';
+            
+            setTimeout(() => {
+                currentPage = page;
+                const startIndex = page * postsPerPage;
+                
+                // Get all post containers
+                const postElements = document.querySelectorAll('.post');
+                
+                // Update their content
+                for (let i = 0; i < postsPerPage; i++) {
+                    const postIndex = startIndex + i;
+                    
+                    if (postIndex < totalPosts) {
+                        updatePostContent(postElements[i], posts[postIndex]);
+                        postElements[i].style.display = 'block';
+                    } else {
+                        // Hide extra blocks
+                        postElements[i].style.display = 'none';
+                    }
                 }
+                
+                updateNavButtons();
+                loader.style.display = 'none';
+                
+                // Scroll the page only if requested (navigation button)
+                if (scrollToTop && page > 0) {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 500); // Simulate loading delay
+        }
+
+        // Button click handlers
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 0) {
+                loadPostsPage(0, true); // Return to beginning with scroll
             }
         });
 
-        // Отображаем первую страницу постов при загрузке
-        displayPosts();
+        nextButton.addEventListener('click', () => {
+            if (currentPage < totalPages - 1) {
+                loadPostsPage(currentPage + 1, true); // Load with scroll
+            }
+        });
+
+        // Scroll handler for window instead of container
+        let isLoading = false; // Flag to prevent multiple loads
+        let isAutoScrolling = false; // Flag to identify programmatic scrolling
+        
+        window.addEventListener('scroll', () => {
+            // If programmatic scrolling, ignore the event
+            if (isAutoScrolling) return;
+            
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            const scrolledToBottom = scrollTop + windowHeight >= documentHeight - 100;
+            const scrolledToTop = scrollTop <= 50;
+            
+            // Load next page when scrolling down
+            if (scrolledToBottom && !isLoading && currentPage < totalPages - 1) {
+                isLoading = true;
+                setTimeout(() => {
+                    loadPostsPage(currentPage + 1, false); // Load WITHOUT scrolling
+                    
+                    // After loading, jump back a bit to allow further scrolling
+                    isAutoScrolling = true;
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: scrollTop - (windowHeight * 0.5), // Jump back by 50% of window height
+                            behavior: 'auto'
+                        });
+                        setTimeout(() => {
+                            isAutoScrolling = false;
+                        }, 100);
+                    }, 100);
+                    
+                    isLoading = false;
+                }, 300);
+            }
+            
+            // Load previous page when scrolling up
+            if (scrolledToTop && !isLoading && currentPage > 0) {
+                isLoading = true;
+                setTimeout(() => {
+                    loadPostsPage(currentPage - 1, false); // Load WITHOUT scrolling
+                    
+                    // After loading, jump down a bit to allow scrolling up
+                    isAutoScrolling = true;
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: windowHeight * 0.3, // Jump down by 30% of window height
+                            behavior: 'auto'
+                        });
+                        setTimeout(() => {
+                            isAutoScrolling = false;
+                        }, 100);
+                    }, 100);
+                    
+                    isLoading = false;
+                }, 300);
+            }
+        });
+
+        // Initialization
+        createPostContainers();
+        loadPostsPage(0);
     </script>
 </body>
 </html>
