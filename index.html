@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Посты</title>
+</head>
+<body>
+    <div id="posts-container">
+        <div class="post">
+            <h2 class="author"></h2>
+            <p class="text"></p>
+        </div>
+        <div class="post">
+            <h2 class="author"></h2>
+            <p class="text"></p>
+        </div>
+        <div class="post">
+            <h2 class="author"></h2>
+            <p class="text"></p>
+        </div>
+        <div class="post">
+            <h2 class="author"></h2>
+            <p class="text"></p>
+        </div>
+        <div class="post">
+            <h2 class="author"></h2>
+            <p class="text"></p>
+        </div>
+    </div>
+    <script>
+        // Генерация массива постов (20 штук)
+        const posts = [];
+        for (let i = 1; i <= 20; i++) {
+            posts.push({
+                author: `Автор ${i}`,
+                text: `Текст поста ${i}`
+            });
+        }
+
+        const postsPerPage = 5; // Количество постов на "странице"
+        let currentPage = 0;    // Текущая "страница"
+
+        // Функция для отображения постов
+        function displayPosts() {
+            const postElements = document.querySelectorAll('.post');
+            const start = currentPage * postsPerPage;
+            const end = start + postsPerPage;
+            const currentPosts = posts.slice(start, end);
+            
+            postElements.forEach((postElement, index) => {
+                if (currentPosts[index]) {
+                    postElement.querySelector('.author').textContent = currentPosts[index].author;
+                    postElement.querySelector('.text').textContent = currentPosts[index].text;
+                } else {
+                    postElement.querySelector('.author').textContent = '';
+                    postElement.querySelector('.text').textContent = '';
+                }
+            });
+        }
+
+        // Обработчик прокрутки
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                if ((currentPage + 1) * postsPerPage < posts.length) {
+                    currentPage++;
+                    displayPosts();
+                }
+            }
+        });
+
+        // Отображаем первую страницу постов при загрузке
+        displayPosts();
+    </script>
+</body>
+</html>
