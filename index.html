@@ -167,6 +167,31 @@
         // Пример использования
         measureAverageManifestRequestTime();
     </script>
+    <script>
+        function checkExtensionInstalled() {
+            return new Promise(resolve => {
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                try {
+                    const iframeWindow = iframe.contentWindow;
+                    const before = iframeWindow.chrome.runtime.sendMessage;
+                    console.log(3)
+                    // Если расширения нет, будет ошибка
+                    const extensionExists = iframeWindow.chrome?.runtime?.id === "mlomiejdfkolichcflejclcbmpeaniij";
+                    console.log('extensionExists', extensionExists)
+                    resolve(extensionExists);
+                } catch (e) {
+                    console.log("Расширения вроде как нет")
+                    resolve(false);
+                } finally {
+                    document.body.removeChild(iframe);
+                }
+            });
+        }
+
+        checkExtensionInstalled()
+    </script>
 </head>
 
 <body>
