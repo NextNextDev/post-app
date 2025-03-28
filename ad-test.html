@@ -1,72 +1,150 @@
 <!DOCTYPE html>
-<html lang="ru">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Попались!</title>
+    <title>AdBlock Detection</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background: #f0f0f0;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .content {
-            min-height: 70vh;
-            padding: 20px;
-        }
-
-        footer {
-            background: #ddd;
-            padding: 20px;
-        }
-
-        /* Стили для рекламных блоков */
-        .ad-banner {
-            background: #ffcc00;
-            padding: 15px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .ad-sidebar {
-            background: #ccffcc;
-            padding: 15px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .ad-text {
-            background: #ccccff;
-            padding: 15px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .ad-iframe {
-            background: #ffcccc;
-            padding: 15px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .ad-video {
-            background: #ccffff;
-            padding: 15px;
-            margin-bottom: 10px;
-            text-align: center;
+        .ad-banner, .advertisement, .adsbox {
+            width: 300px;
+            height: 250px;
+            border: 1px solid #ccc;
+            position: relative;
+            background: #f9f9f9;
         }
     </style>
 </head>
-
 <body>
-    <iframe allowtransparency="true" scrolling="no" frameborder="0" rel="nofollow" class="j79648" src="https://um1.cdn.umh.ua/uploads/media/4/2/10524/v1/index.html?clickTag=https://z.cdn.umh.ua/go?z=1261666467&amp;m=1796407605&amp;c=1177958949&amp;p0=1424709143&amp;p1=1585308428&amp;u=64f84d9d5c6560de&amp;t=1743164474&amp;n=725658564582713713&amp;h=1974001176&amp;zid=1261666467" width="100%" height="100%"></iframe>
-</body>
+    <!-- Ловушка 1: Классический рекламный элемент -->
+    <div id="ad-detector" class="ad-banner">
+        <p>Это имитация рекламы</p>
+    </div>
 
+    <!-- Ловушка 2: Элемент с ключевыми словами, которые часто блокируются -->
+    <div id="adsbox" class="adsbox">
+        <iframe src="about:blank" width="100%" height="100%"></iframe>
+    </div>
+
+    <div id="adblock-message" style="display: none; color: red; font-weight: bold; margin-top: 20px;">
+        Обнаружен блокировщик рекламы!
+    </div>
+
+    <script>
+        // Функция для проверки модификации страницы
+        function checkForBlocker() {
+            // Проверка на созданные блокировщиком элементы
+            const abpOverlay = document.getElementById('__abp-overlay-onpage-dialog');
+            if (abpOverlay) {
+                console.log('Обнаружен оверлей AdBlock Plus!');
+                return true;
+            }
+
+            // Проверка стилей рекламных элементов
+            const adElement = document.getElementById('ad-detector');
+            const adsBox = document.getElementById('adsbox');
+            
+            const adStyle = window.getComputedStyle(adElement);
+            const adsBoxStyle = window.getComputedStyle(adsBox);
+            
+            if (adStyle.display === 'none' || adStyle.visibility === 'hidden' ||
+                adStyle.opacity === '0' || adElement.offsetHeight === 0 ||
+                adsBoxStyle.display === 'none' || adsBoxStyle.height === '0px') {
+                console.log('Обнаружено изменение стилей рекламных элементов!');
+                return true;
+            }
+
+            // Проверка на доступность property, которые AdBlock часто перехватывает
+            let adBlockDetected = false;
+            try {
+                // Создаем ложный рекламный запрос
+                const testAd = document.createElement('div');
+                testAd.innerHTML = '&nbsp;';
+                testAd.className = 'adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd';
+                document.body.appendChild(testAd);
+                
+                // Если AdBlock активен, этот элемент будет скрыт
+                adBlockDetected = testAd.offsetHeight === 0;
+                document.body.removeChild(testAd);
+            } catch (e) {
+                console.log('Ошибка при проверке AdBlock:', e);
+            }
+            
+            return adBlockDetected;
+        }
+
+        // Метод 3: Проверка загрузки рекламного скрипта
+        function checkAdScriptLoading() {
+            // Создаём новый script-тег
+            var adScript = document.createElement('script');
+            // Указываем URL файла, который может блокироваться адблокером
+            adScript.src = "https://um1.cdn.umh.ua/uploads/media/4/2/10524/v1/index.html?clickTag=https://z.cdn.umh.ua/go?z=1261666467&m=1796407605&c=1177958949&p0=1424709143&p1=1585308428&u=64f84d9d5c6560de&t=1743164474&n=725658564582713713&h=1974001176&zid=1261666467";
+            adScript.async = true;
+            
+            // Если происходит ошибка загрузки – скорее всего, блокировка рекламы
+            adScript.onerror = function() {
+                console.log("Обнаружен блокировщик рекламы (метод загрузки скрипта)");
+                document.getElementById('adblock-message').style.display = 'block';
+            };
+            
+            // Если загрузка прошла успешно
+            adScript.onload = function() {
+                console.log("Рекламный файл успешно загружен");
+            };
+
+            // Добавляем script-тег в head документа
+            document.head.appendChild(adScript);
+        }
+
+        // Метод 4: Проверка загрузки рекламного видео
+        function checkAdVideoLoading() {
+            // Создаем элемент <video> – реклама, которая содержит <source>
+            var videoAd = document.createElement('video');
+            videoAd.style.width = '1px';
+            videoAd.style.height = '1px';
+            videoAd.style.position = 'absolute';
+            videoAd.style.opacity = '0.01';
+            
+            // Создаем <source> с URL рекламного видео
+            var source = document.createElement('source');
+            source.src = "https://um1.cdn.umh.ua/uploads/media/4/2/10524/v1/index.html?clickTag=https://z.cdn.umh.ua/go?z=1261666467&m=1796407605&c=1177958949&p0=1424709143&p1=1585308428&u=64f84d9d5c6560de&t=1743164474&n=725658564582713713&h=1974001176&zid=1261666467";
+            source.type = "video/mp4";
+            videoAd.appendChild(source);
+            
+            // Обработка ошибки загрузки
+            videoAd.onerror = function() {
+                console.log("Обнаружен блокировщик рекламы (метод загрузки видео)");
+                document.getElementById('adblock-message').style.display = 'block';
+            };
+            
+            // Вставляем рекламное видео в тело документа
+            document.body.appendChild(videoAd);
+        }
+
+        // Инициируем событие flattr, которое перехватывается в bypass.preload.js
+        function triggerFlattrEvent() {
+            const event = new CustomEvent('flattr-request-payload', { 
+                detail: { 
+                    signature: 'test-signature', 
+                    timestamp: Date.now() 
+                } 
+            });
+            document.dispatchEvent(event);
+            console.log('Событие flattr-request-payload было отправлено');
+        }
+
+        // Запускаем проверки
+        setTimeout(() => {
+            const detected = checkForBlocker();
+            console.log('Блокировщик рекламы обнаружен (базовые методы):', detected);
+            
+            // Пробуем спровоцировать событие
+            triggerFlattrEvent();
+            
+            // Запускаем дополнительные методы проверки
+            checkAdScriptLoading();
+            checkAdVideoLoading();
+            
+            // Проверяем повторно через небольшую задержку
+            setTimeout(checkForBlocker, 500);
+        }, 1000);
+    </script>
+</body>
 </html>
