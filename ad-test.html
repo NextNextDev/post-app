@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>AdBlock Detection</title>
     <style>
-        .ad-banner, .advertisement, .adsbox {
+        .ad-banner,
+        .advertisement,
+        .adsbox {
             width: 300px;
             height: 250px;
             border: 1px solid #ccc;
@@ -12,6 +15,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Ловушка 1: Классический рекламный элемент -->
     <div id="ad-detector" class="ad-banner">
@@ -20,7 +24,20 @@
 
     <!-- Ловушка 2: Элемент с ключевыми словами, которые часто блокируются -->
     <div id="adsbox" class="adsbox">
-        <iframe src="about:blank" width="100%" height="100%"></iframe>
+        <iframe width="100%" height="100%"></iframe>
+    </div>
+
+    <div id="adsbox2" class="adsbox2">
+        <iframe
+            src="https://cdn77.srv224.com/files2204/15/996/11205/1_V_BET_Wild_West_UPD_01%20(video-converter.com).mp4"
+            width="100%" height="100%"></iframe>
+    </div>
+
+    <div class="top_reklama">This is reklama</div>
+    <div id="test1">
+        <div id="test">
+            <div class="wrap__sns">This is sns</div>
+        </div>
     </div>
 
     <div id="adblock-message" style="display: none; color: red; font-weight: bold; margin-top: 20px;">
@@ -29,63 +46,63 @@
 
     <script>
         // Функция для проверки модификации страницы
-        function checkForBlocker() {
-            // Проверка на созданные блокировщиком элементы
-            const abpOverlay = document.getElementById('__abp-overlay-onpage-dialog');
-            if (abpOverlay) {
-                console.log('Обнаружен оверлей AdBlock Plus!');
-                return true;
-            }
+        // function checkForBlocker() {
+        //     // Проверка на созданные блокировщиком элементы
+        //     const abpOverlay = document.getElementById('__abp-overlay-onpage-dialog');
+        //     if (abpOverlay) {
+        //         console.log('Обнаружен оверлей AdBlock Plus!');
+        //         return true;
+        //     }
 
-            // Проверка стилей рекламных элементов
-            const adElement = document.getElementById('ad-detector');
-            const adsBox = document.getElementById('adsbox');
-            
-            const adStyle = window.getComputedStyle(adElement);
-            const adsBoxStyle = window.getComputedStyle(adsBox);
-            
-            if (adStyle.display === 'none' || adStyle.visibility === 'hidden' ||
-                adStyle.opacity === '0' || adElement.offsetHeight === 0 ||
-                adsBoxStyle.display === 'none' || adsBoxStyle.height === '0px') {
-                console.log('Обнаружено изменение стилей рекламных элементов!');
-                return true;
-            }
+        //     // Проверка стилей рекламных элементов
+        //     const adElement = document.getElementById('ad-detector');
+        //     const adsBox = document.getElementById('adsbox');
 
-            // Проверка на доступность property, которые AdBlock часто перехватывает
-            let adBlockDetected = false;
-            try {
-                // Создаем ложный рекламный запрос
-                const testAd = document.createElement('div');
-                testAd.innerHTML = '&nbsp;';
-                testAd.className = 'adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd';
-                document.body.appendChild(testAd);
-                
-                // Если AdBlock активен, этот элемент будет скрыт
-                adBlockDetected = testAd.offsetHeight === 0;
-                document.body.removeChild(testAd);
-            } catch (e) {
-                console.log('Ошибка при проверке AdBlock:', e);
-            }
-            
-            return adBlockDetected;
-        }
+        //     const adStyle = window.getComputedStyle(adElement);
+        //     const adsBoxStyle = window.getComputedStyle(adsBox);
+
+        //     if (adStyle.display === 'none' || adStyle.visibility === 'hidden' ||
+        //         adStyle.opacity === '0' || adElement.offsetHeight === 0 ||
+        //         adsBoxStyle.display === 'none' || adsBoxStyle.height === '0px') {
+        //         console.log('Обнаружено изменение стилей рекламных элементов!');
+        //         return true;
+        //     }
+
+        //     // Проверка на доступность property, которые AdBlock часто перехватывает
+        //     let adBlockDetected = false;
+        //     try {
+        //         // Создаем ложный рекламный запрос
+        //         const testAd = document.createElement('div');
+        //         testAd.innerHTML = '&nbsp;';
+        //         testAd.className = 'adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd';
+        //         document.body.appendChild(testAd);
+
+        //         // Если AdBlock активен, этот элемент будет скрыт
+        //         adBlockDetected = testAd.offsetHeight === 0;
+        //         document.body.removeChild(testAd);
+        //     } catch (e) {
+        //         console.log('Ошибка при проверке AdBlock:', e);
+        //     }
+
+        //     return adBlockDetected;
+        // }
 
         // Метод 3: Проверка загрузки рекламного скрипта
         function checkAdScriptLoading() {
             // Создаём новый script-тег
             var adScript = document.createElement('script');
             // Указываем URL файла, который может блокироваться адблокером
-            adScript.src = "https://um1.cdn.umh.ua/uploads/media/4/2/10524/v1/index.html?clickTag=https://z.cdn.umh.ua/go?z=1261666467&m=1796407605&c=1177958949&p0=1424709143&p1=1585308428&u=64f84d9d5c6560de&t=1743164474&n=725658564582713713&h=1974001176&zid=1261666467";
+            adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
             adScript.async = true;
-            
+
             // Если происходит ошибка загрузки – скорее всего, блокировка рекламы
-            adScript.onerror = function() {
+            adScript.onerror = function () {
                 console.log("Обнаружен блокировщик рекламы (метод загрузки скрипта)");
                 document.getElementById('adblock-message').style.display = 'block';
             };
-            
+
             // Если загрузка прошла успешно
-            adScript.onload = function() {
+            adScript.onload = function () {
                 console.log("Рекламный файл успешно загружен");
             };
 
@@ -93,58 +110,356 @@
             document.head.appendChild(adScript);
         }
 
-        // Метод 4: Проверка загрузки рекламного видео
+        // Метод 4: Улучшенная проверка загрузки рекламного видео
         function checkAdVideoLoading() {
-            // Создаем элемент <video> – реклама, которая содержит <source>
+            console.log("Запуск проверки через видео...");
+            // Создаем элемент <video>
             var videoAd = document.createElement('video');
             videoAd.style.width = '1px';
             videoAd.style.height = '1px';
             videoAd.style.position = 'absolute';
             videoAd.style.opacity = '0.01';
-            
+            videoAd.muted = true;
+            videoAd.playsInline = true;
+            videoAd.autoplay = true;
+
             // Создаем <source> с URL рекламного видео
+            // Используем более очевидно рекламный URL
             var source = document.createElement('source');
-            source.src = "https://um1.cdn.umh.ua/uploads/media/4/2/10524/v1/index.html?clickTag=https://z.cdn.umh.ua/go?z=1261666467&m=1796407605&c=1177958949&p0=1424709143&p1=1585308428&u=64f84d9d5c6560de&t=1743164474&n=725658564582713713&h=1974001176&zid=1261666467";
+            source.src = "https://cdn77.srv224.com/files2204/15/996/11205/1_V_BET_Wild_West_UPD_01%20(video-converter.com).mp4";
             source.type = "video/mp4";
             videoAd.appendChild(source);
-            
-            // Обработка ошибки загрузки
-            videoAd.onerror = function() {
-                console.log("Обнаружен блокировщик рекламы (метод загрузки видео)");
-                document.getElementById('adblock-message').style.display = 'block';
+
+            // Обработка всех возможных событий
+            videoAd.onerror = function (e) {
+                console.log("Ошибка загрузки видео:", e);
+                updateAdBlockDetectionStatus("Метод видео: блокировщик обнаружен (ошибка загрузки)");
             };
-            
+
+            // Таймаут для проверки состояния видео
+            const videoTimeout = setTimeout(() => {
+                // Если видео не начало загружаться через 2 секунды, вероятно оно заблокировано
+                if (videoAd.readyState === 0) {
+                    console.log("Видео не загружается (возможно заблокировано)");
+                    updateAdBlockDetectionStatus("Метод видео: блокировщик обнаружен (таймаут загрузки)");
+                }
+            }, 2000);
+
+            // Обработка события загрузки метаданных видео
+            videoAd.onloadedmetadata = function () {
+                console.log("Метаданные видео загружены - блокировщик не обнаружен");
+                clearTimeout(videoTimeout);
+            };
+
             // Вставляем рекламное видео в тело документа
             document.body.appendChild(videoAd);
+
+            // // Дополнительная проверка: добавим iframe с рекламным видео
+            // const adIframe = document.createElement('iframe');
+            // adIframe.src = "https://cdn77.srv224.com/files2204/15/996/11205/1_V_BET_Wild_West_UPD_01%20(video-converter.com).mp4";
+            // adIframe.style.width = "1px";
+            // adIframe.style.height = "1px";
+            // adIframe.style.opacity = "0.01";
+            // adIframe.style.position = "absolute";
+
+            // adIframe.onerror = function() {
+            //     console.log("Ошибка загрузки рекламного iframe");
+            //     updateAdBlockDetectionStatus("Метод iframe: блокировщик обнаружен");
+            // };
+
+            // document.body.appendChild(adIframe);
         }
 
         // Инициируем событие flattr, которое перехватывается в bypass.preload.js
         function triggerFlattrEvent() {
-            const event = new CustomEvent('flattr-request-payload', { 
-                detail: { 
-                    signature: 'test-signature', 
-                    timestamp: Date.now() 
-                } 
+            const event = new CustomEvent('flattr-request-payload', {
+                detail: {
+                    signature: 'test-signature',
+                    timestamp: Date.now()
+                }
             });
             document.dispatchEvent(event);
             console.log('Событие flattr-request-payload было отправлено');
         }
 
+        // Централизованное обновление статуса обнаружения
+        function updateAdBlockDetectionStatus(message) {
+            const messageElement = document.getElementById('adblock-message');
+            messageElement.style.display = 'block';
+
+            // Добавляем новый пункт с сообщением
+            const detailElement = document.createElement('p');
+            detailElement.textContent = message;
+            messageElement.appendChild(detailElement);
+        }
+
         // Запускаем проверки
         setTimeout(() => {
-            const detected = checkForBlocker();
-            console.log('Блокировщик рекламы обнаружен (базовые методы):', detected);
-            
-            // Пробуем спровоцировать событие
+            // Создаем функции с колбэками для сохранения результатов
+            function runBaseCheck() {
+                // const detected = checkForBlocker();
+                // console.log('Блокировщик рекламы обнаружен (базовые методы):', detected);
+                // if (detected) {
+                //     updateAdBlockDetectionStatus("Базовые методы: блокировщик обнаружен");
+                // }
+            }
+
+            function runScriptCheck() {
+                // Перезапишем обработчик ошибки, чтобы использовать updateAdBlockDetectionStatus
+                const originalCheckAdScriptLoading = checkAdScriptLoading;
+                checkAdScriptLoading = function () {
+                    var adScript = document.createElement('script');
+                    adScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+                    adScript.async = true;
+
+                    adScript.onerror = function () {
+                        console.log("Обнаружен блокировщик рекламы (метод загрузки скрипта)");
+                        updateAdBlockDetectionStatus("Метод скрипта: блокировщик обнаружен");
+                    };
+
+                    adScript.onload = function () {
+                        console.log("Рекламный файл успешно загружен");
+                    };
+
+                    document.head.appendChild(adScript);
+                };
+
+                checkAdScriptLoading();
+            }
+
+            // Запускаем все методы последовательно
+            runBaseCheck();
             triggerFlattrEvent();
-            
-            // Запускаем дополнительные методы проверки
-            checkAdScriptLoading();
+            runScriptCheck();
             checkAdVideoLoading();
-            
+
             // Проверяем повторно через небольшую задержку
-            setTimeout(checkForBlocker, 500);
+            setTimeout(runBaseCheck, 500);
         }, 1000);
     </script>
+
+    <script>
+        (async () => {
+            // 1. Создаем тестовый элемент, соответствующий фильтру
+            const testElement = document.createElement('div');
+            testElement.id = 'facebook-likeButton-test'; // Соответствует "-facebook-likeButton-"
+            testElement.style.display = 'block';         // Явно задаем стиль
+            testElement.style.visibility = 'visible';
+            testElement.textContent = 'Test Social Button';
+            testElement.className = 'facebook-share follow-icons share-buttons2 follow-icon-test';
+            document.body.appendChild(testElement);
+
+            // 2. Функция для проверки стилей
+            const checkStyles = () => {
+                const computedStyle = window.getComputedStyle(testElement);
+                return {
+                    display: computedStyle.display,
+                    visibility: computedStyle.visibility,
+                    isRemoved: !document.body.contains(testElement)
+                };
+            };
+
+            // 3. Изначальные стили
+            const initialStyles = checkStyles();
+            console.log('Изначальные стили:', initialStyles);
+
+            // 4. Наблюдаем за изменениями в DOM с помощью MutationObserver
+            let scriptDetected = false;
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.target === testElement) {
+                        const currentStyles = checkStyles();
+                        if (currentStyles.display === 'none' || currentStyles.visibility === 'hidden') {
+                            console.log('Скрипт обнаружен: элемент был скрыт (display или visibility изменены)!');
+                            scriptDetected = true;
+                        } else if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                            console.log('Скрипт обнаружен: стиль элемента изменен!');
+                            scriptDetected = true;
+                        }
+                    }
+                    // Проверяем удаление элемента
+                    if (mutation.removedNodes && Array.from(mutation.removedNodes).includes(testElement)) {
+                        console.log('Скрипт обнаружен: элемент был удален из DOM!');
+                        scriptDetected = true;
+                    }
+                });
+            });
+
+            // Наблюдаем за атрибутами элемента и его родителем (для удаления)
+            observer.observe(testElement, {
+                attributes: true,
+                attributeFilter: ['style'],
+                subtree: false
+            });
+            observer.observe(document.body, {
+                childList: true,
+                subtree: false
+            });
+
+            // 5. Даем время скрипту сработать
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // 6. Проверяем стили или удаление после задержки
+            const finalStyles = checkStyles();
+            if (finalStyles.display === 'none' || finalStyles.visibility === 'hidden') {
+                console.log('Скрипт обнаружен: элемент скрыт после задержки!');
+                scriptDetected = true;
+            }
+            if (finalStyles.isRemoved) {
+                console.log('Скрипт обнаружен: элемент удален после задержки!');
+                scriptDetected = true;
+            }
+
+            // 7. Итог
+            if (!scriptDetected) {
+                console.log('Скрипт не обнаружен или не активен для этих фильтров.');
+            } else {
+                console.log('Скрипт успешно обнаружен и работает с фильтрами Fanboy\'s Social Blocking List!');
+            }
+
+            // 8. Очистка
+            observer.disconnect();
+            if (document.body.contains(testElement)) {
+                // testElement.remove();
+            }
+            console.log('Тест завершен.');
+        })();
+
+        (async () => {
+            // Создаем несколько тестовых элементов с разными правилами блокировки
+            const testElements = [
+                // Существующий элемент
+                {
+                    id: 'facebook-likeButton-test',
+                    className: 'facebook-share follow-icons share-buttons2 follow-icon-test',
+                    label: 'Test Social Button 1'
+                },
+                // Дополнительные элементы для тестирования других правил
+                {
+                    id: 'share-sprite-container',
+                    className: 'sharebar social-panel social-sidebar',
+                    label: 'Test Social Button 2'
+                },
+                {
+                    id: 'social-slider',
+                    className: 'shareWidget sprite-social share-tools',
+                    label: 'Test Social Button 3'
+                }
+            ];
+
+            // Создаем и добавляем элементы на страницу
+            const createdElements = testElements.map(config => {
+                const element = document.createElement('div');
+                element.id = config.id;
+                element.className = config.className;
+                element.textContent = config.label;
+                element.style.display = 'block';
+                element.style.visibility = 'visible';
+                element.style.margin = '10px';
+                element.style.padding = '5px';
+                element.style.border = '1px solid #ccc';
+                document.body.appendChild(element);
+                return element;
+            });
+
+            // Функция для проверки стилей
+            const checkStyle = (element) => {
+                const computedStyle = window.getComputedStyle(element);
+                return {
+                    display: computedStyle.display,
+                    visibility: computedStyle.visibility,
+                    isRemoved: !document.body.contains(element)
+                };
+            };
+
+            // Записываем изначальные стили
+            const initialStyles = createdElements.map((elem, index) => {
+                const styles = checkStyle(elem);
+                console.log(`Изначальные стили для ${testElements[index].id}:`, styles);
+                return styles;
+            });
+
+            // Создаем MutationObserver для отслеживания изменений
+            let scriptDetected = false;
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (createdElements.includes(mutation.target)) {
+                        const index = createdElements.indexOf(mutation.target);
+                        const elementId = testElements[index].id;
+                        const currentStyles = checkStyle(mutation.target);
+
+                        if (currentStyles.display === 'none' || currentStyles.visibility === 'hidden') {
+                            console.log(`Скрипт обнаружен: элемент ${elementId} был скрыт!`);
+                            scriptDetected = true;
+                        } else if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                            console.log(`Скрипт обнаружен: стиль элемента ${elementId} изменен!`);
+                            scriptDetected = true;
+                        }
+                    }
+
+                    // Проверяем удаление элементов
+                    if (mutation.removedNodes) {
+                        Array.from(mutation.removedNodes).forEach(node => {
+                            if (createdElements.includes(node)) {
+                                const index = createdElements.indexOf(node);
+                                console.log(`Скрипт обнаружен: элемент ${testElements[index].id} был удален из DOM!`);
+                                scriptDetected = true;
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Наблюдаем за всеми элементами и body
+            createdElements.forEach(element => {
+                observer.observe(element, {
+                    attributes: true,
+                    attributeFilter: ['style', 'class'],
+                    subtree: false
+                });
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: false
+            });
+
+            // Ждем, чтобы дать блокировщику время сработать
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Проверяем стили после задержки
+            createdElements.forEach((element, index) => {
+                if (document.body.contains(element)) {
+                    const finalStyles = checkStyle(element);
+                    const elementId = testElements[index].id;
+
+                    if (finalStyles.display === 'none' || finalStyles.visibility === 'hidden') {
+                        console.log(`Скрипт обнаружен: элемент ${elementId} скрыт после задержки!`);
+                        scriptDetected = true;
+                        updateAdBlockDetectionStatus(`Соц. блокировщик: элемент ${elementId} скрыт`);
+                    }
+                } else {
+                    console.log(`Скрипт обнаружен: элемент ${testElements[index].id} удален после задержки!`);
+                    scriptDetected = true;
+                    updateAdBlockDetectionStatus(`Соц. блокировщик: элемент ${testElements[index].id} удален`);
+                }
+            });
+
+            // Итог
+            if (!scriptDetected) {
+                console.log('Социальный блокировщик не обнаружен или не активен.');
+            } else {
+                console.log('Социальный блокировщик обнаружен (Fanboy\'s Social Blocking List)!');
+                updateAdBlockDetectionStatus("Социальный блокировщик (Fanboy's) обнаружен");
+            }
+
+            // Очистка
+            observer.disconnect();
+
+            console.log('Тест социального блокировщика завершен.');
+        })();
+    </script>
+
 </body>
+
 </html>

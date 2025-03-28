@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="rtn4p">
+        test
+    </div>
+    <a href="//mage98rquewz.com/some/path">Пример ссылки</a>
+    <div class="one-teasers-some" id="one-teasers-soome">Пример ссылки</div>
+    <div id="adsbox" class="adsbox">
+        <iframe width="100%" height="100%"></iframe>
+    </div>
+
+    <div id="share-bar">
+        <button class="share-button">Поделиться</button>
+    </div>
+    <div class="social-follow-icons">
+        <div class="follow-icon-twitter"></div>
+        <div class="follow-icon-facebook"></div>
+    </div>
+    <div class="facebook-likeButton-container">
+        <a href="#" class="facebook-share">Поделиться в Facebook</a>
+        <a href="mage98rquewz.com/some/path">Пример ссылки</a>
+    </div>
+    <script>
+        // Создаем тестовый элемент, который часто блокируется фильтрами
+        var testAd = document.createElement('div');
+        testAd.className = 'adsbox'; // имя класса, которое, как правило, попадает под правила блокировки
+        // Чтобы элемент не занимал место на странице, задаем минимальные размеры и абсолютное позиционирование
+        testAd.style.width = '1px';
+        testAd.style.height = '1px';
+        testAd.style.position = 'absolute';
+        testAd.style.top = '0';
+        testAd.style.left = '0';
+        document.body.appendChild(testAd);
+
+        // Ждем некоторое время, чтобы контент‑скрипт (если он активен) смог отреагировать
+        setTimeout(function () {
+            var computed = window.getComputedStyle(testAd);
+            if (computed.display === 'none' || computed.visibility === 'hidden') {
+                console.log("Контент‑скрипт блокировки (AdBlock) активен – тестовый элемент скрыт.");
+            } else {
+                console.log("Контент‑скрипт блокировки, похоже, не работает.");
+            }
+        }, 1500);
+
+    </script>
+</body>
+
+</html>
